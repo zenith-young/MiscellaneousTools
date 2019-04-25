@@ -4,7 +4,9 @@
 
 用来辅助英语学习的工具，使用 python 编写
 
-[TOC]
+* [EnglishLearningTools](#EnglishLearningTools)
+  * [Overview](#Overview)
+  * [english_word_frequency_statistics.py](#english_word_frequency_statistics.py)
 
 ## english_word_frequency_statistics.py
 
@@ -54,6 +56,7 @@ conda install -c conda-forge/label/cf201901 pdfminer3k
 2) 安装 nltk：
 
 [Installing NLTK](http://www.nltk.org/install.html)
+
 [Installing NLTK Data](http://www.nltk.org/data.html)
 
 nltk 是 python 自然语言处理库，必须搭配 nltk data 使用，其中有各种插件等等，简要记录一下安装步骤：
@@ -76,5 +79,4 @@ pip install -U nltk
 修改 app.py，填写你要统计的文件或者文件夹
 
 再编译运行源码就没有错误了
-
 
