@@ -4,9 +4,9 @@
 
 用来辅助英语学习的工具，使用 python 编写
 
-* [EnglishLearningTools](#EnglishLearningTools)
-  * [Overview](#Overview)
-  * [english_word_frequency_statistics.py](#english_word_frequency_statistics.py)
+- [EnglishLearningTools](#EnglishLearningTools)
+  - [Overview](#Overview)
+  - [english_word_frequency_statistics.py](#english_word_frequency_statistics.py)
 
 ## english_word_frequency_statistics.py
 
