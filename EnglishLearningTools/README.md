@@ -50,7 +50,6 @@
 网站上有命令：
 ```shell
 conda install -c conda-forge pdfminer3k
-conda install -c conda-forge/label/cf201901 pdfminer3k
 ```
 
 2) 安装 nltk：
@@ -79,4 +78,46 @@ pip install -U nltk
 修改 app.py，填写你要统计的文件或者文件夹
 
 再编译运行源码就没有错误了
+
+3) 安装 numpy、matplotlib：（不再使用，可跳过）
+
+理论上安装完 Anaconda 之后，这些包默认就有了，但是使用 PyCharm 编译运行报错：
+
+```
+C:\Fate\Developer\Anaconda_5.3.1\python.exe C:/Fate/Workplace/miscellaneous/EnglishLearningTools/app.py
+Traceback (most recent call last):
+  File "C:/Fate/Workplace/miscellaneous/EnglishLearningTools/app.py", line 4, in <module>
+    from english_word_frequency_statistics import EnglishWordFrequencyStatistics, StatisticsCharts
+  File "C:\Fate\Workplace\miscellaneous\EnglishLearningTools\english_word_frequency_statistics.py", line 8, in <module>
+    import numpy as np
+  File "C:\Fate\Developer\Anaconda_5.3.1\lib\site-packages\numpy\__init__.py", line 140, in <module>
+    from . import _distributor_init
+  File "C:\Fate\Developer\Anaconda_5.3.1\lib\site-packages\numpy\_distributor_init.py", line 34, in <module>
+    from . import _mklinit
+ImportError: DLL load failed: The specified module could not be found.
+
+Process finished with exit code 1
+```
+
+但是奇怪的是，直接使用 conda 命令行 import numpy 没有错，最后在 jetbrain 官网的一条评论里找到了解决方案：
+
+说明：PyCharm 会要求填写 python 的路径，我并没有填写 conda 的 envs 路径，而是直接使用的 base env，并且系统变量 PATH 中没有设置 python 路径，原理不是很清楚，设置完系统变量就好了。
+
+```
+系统变量 PATH 中添加：
+C:\Fate\Developer\Anaconda_5.3.1\Library\bin
+```
+
+附链接：[解决方案：见 Anya Datasci 的回答](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001194720-Numpy-import-error-in-PyCharm-Importing-the-multiarray-numpy-extension-module-failed-)
+
+4) 安装 pyecharts：
+
+试了 matplotlib，由于横轴表示大量的单词，导致 matplotlib 画出来的图几乎没法看，不支持缩放，因此改用 pyecharts 试试：
+
+注：pyecharts 不支持 conda 安装，conda 中默认自带 pip，不是 pip3：
+
+```
+pip install pyecharts
+pip install pyecharts_snapshot
+```
 

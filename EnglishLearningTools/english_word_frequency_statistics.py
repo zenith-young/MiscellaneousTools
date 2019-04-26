@@ -5,6 +5,9 @@ import os
 import re
 import json
 
+import numpy as np
+import matplotlib.pyplot as plt
+
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
@@ -13,6 +16,8 @@ from pdfminer.pdftypes import PDFException
 
 from nltk import pos_tag
 from nltk.stem import WordNetLemmatizer
+
+from pyecharts import Bar
 
 from utils import FileSystemUtils
 
@@ -141,7 +146,7 @@ class EnglishWordFrequencyStatistics(object):
         new_text = pat.sub(' us', new_text)
 
         # 12. 去掉单数所有格: xx's -> xx
-        pat = re.compile(r'(?<=[a-zA-Z])\'s')
+        pat = re.compile(r'(?<=[a-zA-Z0-9])\'s')
         new_text = pat.sub('', new_text)
 
         # 13. 去掉复数所有格: xxs' -> xx
@@ -152,16 +157,16 @@ class EnglishWordFrequencyStatistics(object):
 
     def _calculate_for_formatted_txt_files(self):
 
-        normal_total_result = StatisticsResult()
-        lemmed_total_result = StatisticsResult()
+        normal_results = StatisticsResults()
+        lemmed_results = StatisticsResults()
 
         files = FileSystemUtils.list_all_files_recursively(self._temp_formatted_folder)
         for file in files:
-            normal_single_result, lemmed_single_result = self._calculate_for_formatted_txt_file(file)
-            StatisticsResult.merge(normal_total_result, normal_single_result)
-            StatisticsResult.merge(lemmed_total_result, lemmed_single_result)
+            normal_result, lemmed_result = self._calculate_for_formatted_txt_file(file)
+            normal_results.add(normal_result)
+            lemmed_results.add(lemmed_result)
 
-        return normal_total_result, lemmed_total_result
+        return normal_results, lemmed_results
 
     def _calculate_for_formatted_txt_file(self, file):
 
@@ -182,6 +187,7 @@ class EnglishWordFrequencyStatistics(object):
                     normal_result.word_frequency[word] = 1
             normal_result.total_words = len(words)
             normal_result.total_words_distinct = len(normal_result.word_frequency)
+            normal_result.filename = FileSystemUtils.get_file_name(file)
 
             words = self._lemmatization(txt.split(' '))
             for word in words:
@@ -193,6 +199,7 @@ class EnglishWordFrequencyStatistics(object):
                     lemmed_result.word_frequency[word] = 1
             lemmed_result.total_words = len(words)
             lemmed_result.total_words_distinct = len(lemmed_result.word_frequency)
+            lemmed_result.filename = FileSystemUtils.get_file_name(file)
 
         return normal_result, lemmed_result
 
@@ -212,37 +219,96 @@ class EnglishWordFrequencyStatistics(object):
         return lemmed_words
 
 
-class StatisticsResult(object):
+class StatisticsResults(object):
 
     def __init__(self):
         self.total_words = 0
         self.total_words_distinct = 0
         self.word_frequency = {}
-        self.files_count = 0
+        self.details = []
 
-    @staticmethod
-    def merge(dst, src):
-        if src is None or dst is None:
+    def add(self, result):
+        if result is None:
             return
-        for key, value in src.word_frequency.items():
-            if key in dst.word_frequency:
-                dst.word_frequency[key] += value
+        for key, value in result.word_frequency.items():
+            if key in self.word_frequency:
+                self.word_frequency[key] += value
             else:
-                dst.word_frequency[key] = value
-        dst.total_words += src.total_words
-        dst.total_words_distinct = len(dst.word_frequency)
-        dst.files_count += 1
+                self.word_frequency[key] = value
+        self.total_words += result.total_words
+        self.total_words_distinct = len(self.word_frequency)
+        self.details.append(result)
 
-    def __str__(self):
-
-        obj = {
+    def to_dict(self):
+        return {
             'totalWords': self.total_words,
             'totalWordsDistinct': self.total_words_distinct,
             'wordFrequency': self.word_frequency,
-            'filesCount': self.files_count
+            'details': [result.to_dict() for result in self.details]
         }
 
-        return json.dumps(obj, indent=4)
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+
+class StatisticsResult(object):
+
+    def __init__(self):
+        self.filename = ''
+        self.total_words = 0
+        self.total_words_distinct = 0
+        self.word_frequency = {}
+
+    def to_dict(self):
+        return {
+            'filename': self.filename,
+            'totalWords': self.total_words,
+            'totalWordsDistinct': self.total_words_distinct,
+            'wordFrequency': self.word_frequency,
+        }
+
+    def __str__(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+
+class StatisticsCharts(object):
+
+    @staticmethod
+    def plot_word_frequency(results):
+
+        # 数据源
+
+        xticks = list(results.word_frequency.keys())
+        xticks.sort()
+        yticks = np.arange(0, 20000, 100)
+        index = np.arange(len(xticks))
+        values = [results.word_frequency[key] for key in xticks]
+        width = 0.35
+
+        # 使用 matplotlib 画图，实测效果不好
+
+        # plt.figure()
+        # plt.subplot(1, 1, 1)
+        #
+        # plt.bar(index, values, width, label="Normal")
+        #
+        # plt.xticks(index, xticks)
+        # plt.yticks(yticks)
+        #
+        # plt.xlabel('Words')
+        # plt.ylabel('Frequency')
+        #
+        # plt.title('English Word Frequency Statistics')
+        # plt.legend(loc="upper right")
+        #
+        # plt.show()
+
+        # 使用 pyecharts 画图，缺点是不能实时显示
+
+        fig = Bar('English Word Frequency Statistics', width=1280, height=800, title_pos='center')
+        fig.add('Normal', xticks, values)
+        fig.show_config()
+        fig.render()
 
 
 class PDF2TXTConverter(object):
