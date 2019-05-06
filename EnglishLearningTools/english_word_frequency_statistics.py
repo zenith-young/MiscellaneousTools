@@ -5,9 +5,6 @@ import os
 import re
 import json
 
-import numpy as np
-import matplotlib.pyplot as plt
-
 from pdfminer.pdfparser import PDFParser, PDFDocument
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
@@ -18,17 +15,19 @@ from nltk import pos_tag
 from nltk.stem import WordNetLemmatizer
 
 from pyecharts import Bar
+from pyecharts import Line
 
 from utils import FileSystemUtils
 
 
 class EnglishWordFrequencyStatistics(object):
 
-    def __init__(self, source, temp_folder='temp'):
+    def __init__(self, source, temp_folder='temp', report_folder='report'):
         self._source = source
         self._temp_folder = temp_folder
         self._temp_converted_folder = os.path.join(temp_folder, '1. converted_txt')
         self._temp_formatted_folder = os.path.join(temp_folder, '2. formatted_txt')
+        self._report_folder = report_folder
         self._ignored_words = [
             'esl',
             'www',
@@ -47,11 +46,47 @@ class EnglishWordFrequencyStatistics(object):
         FileSystemUtils.init_folder(self._temp_folder)
         FileSystemUtils.init_folder(self._temp_converted_folder)
         FileSystemUtils.init_folder(self._temp_formatted_folder)
+        FileSystemUtils.init_folder(self._report_folder)
 
     def calculate(self):
         self._convert_files_to_txt_files()
         self._format_txt_files()
         return self._calculate_for_formatted_txt_files()
+
+    # 使用 matplotlib 画图，实测效果很糟糕，放弃
+    # 使用 pyecharts 画图，缺点是不能实时显示
+
+    def plot_word_frequency(self, results, output_filename):
+
+        x_values = list(results.word_frequency.keys())
+        x_values.sort()
+        y_values = [results.word_frequency[key] for key in x_values]
+
+        fig = Bar('English Word Frequency Statistics', width=1280, height=800, title_pos='center')
+        fig.add('Result', x_values, y_values, legend_pos="right", is_datazoom_show=True, datazoom_range=[0, 100])
+        fig.render(path=self._report_folder + '\\' + output_filename)
+
+    def plot_word_learning_curve(self, results_list, legend_list, output_filename):
+
+        fig = Line('English Word Learning Curve', width=1280, height=800, title_pos='center')
+
+        for index, results in enumerate(results_list):
+
+            x_values = []
+            y_values = []
+
+            result_list = results.details
+            sorted(result_list, key=lambda x: x.filename)
+
+            temp = EnglishWordFrequencyStatisticsResults()
+            for i, result in enumerate(result_list):
+                temp.add(result)
+                x_values.append(result.filename)
+                y_values.append(temp.total_words_distinct)
+
+            fig.add(legend_list[index], x_values, y_values, legend_pos="right", is_datazoom_show=True, datazoom_range=[0, 100])
+
+        fig.render(path=self._report_folder + '\\' + output_filename)
 
     # Private Functions
 
@@ -157,8 +192,8 @@ class EnglishWordFrequencyStatistics(object):
 
     def _calculate_for_formatted_txt_files(self):
 
-        normal_results = StatisticsResults()
-        lemmed_results = StatisticsResults()
+        normal_results = EnglishWordFrequencyStatisticsResults()
+        lemmed_results = EnglishWordFrequencyStatisticsResults()
 
         files = FileSystemUtils.list_all_files_recursively(self._temp_formatted_folder)
         for file in files:
@@ -170,8 +205,8 @@ class EnglishWordFrequencyStatistics(object):
 
     def _calculate_for_formatted_txt_file(self, file):
 
-        normal_result = StatisticsResult()
-        lemmed_result = StatisticsResult()
+        normal_result = EnglishWordFrequencyStatisticsResult()
+        lemmed_result = EnglishWordFrequencyStatisticsResult()
 
         with open(file, 'r', encoding='utf-8') as fp:
 
@@ -219,7 +254,7 @@ class EnglishWordFrequencyStatistics(object):
         return lemmed_words
 
 
-class StatisticsResults(object):
+class EnglishWordFrequencyStatisticsResults(object):
 
     def __init__(self):
         self.total_words = 0
@@ -251,7 +286,7 @@ class StatisticsResults(object):
         return json.dumps(self.to_dict(), indent=4)
 
 
-class StatisticsResult(object):
+class EnglishWordFrequencyStatisticsResult(object):
 
     def __init__(self):
         self.filename = ''
@@ -269,46 +304,6 @@ class StatisticsResult(object):
 
     def __str__(self):
         return json.dumps(self.to_dict(), indent=4)
-
-
-class StatisticsCharts(object):
-
-    @staticmethod
-    def plot_word_frequency(results):
-
-        # 数据源
-
-        xticks = list(results.word_frequency.keys())
-        xticks.sort()
-        yticks = np.arange(0, 20000, 100)
-        index = np.arange(len(xticks))
-        values = [results.word_frequency[key] for key in xticks]
-        width = 0.35
-
-        # 使用 matplotlib 画图，实测效果不好
-
-        # plt.figure()
-        # plt.subplot(1, 1, 1)
-        #
-        # plt.bar(index, values, width, label="Normal")
-        #
-        # plt.xticks(index, xticks)
-        # plt.yticks(yticks)
-        #
-        # plt.xlabel('Words')
-        # plt.ylabel('Frequency')
-        #
-        # plt.title('English Word Frequency Statistics')
-        # plt.legend(loc="upper right")
-        #
-        # plt.show()
-
-        # 使用 pyecharts 画图，缺点是不能实时显示
-
-        fig = Bar('English Word Frequency Statistics', width=1280, height=800, title_pos='center')
-        fig.add('Normal', xticks, values)
-        fig.show_config()
-        fig.render()
 
 
 class PDF2TXTConverter(object):
