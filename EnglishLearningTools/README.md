@@ -116,18 +116,18 @@ Process finished with exit code 1
 
 但是奇怪的是，直接使用 conda 命令行 import numpy 没有错，最后在 jetbrain 官网的一条评论里找到了解决方案：
 
-说明：PyCharm 会要求填写 python 的路径，我并没有填写 conda 的 envs 路径，而是直接使用的 base env，并且系统变量 PATH 中没有设置 python 路径，原理不是很清楚，设置完系统变量就好了。
-
 ```
 系统变量 PATH 中添加：
 C:\Fate\Developer\Anaconda_5.3.1\Library\bin
 ```
 
+说明：PyCharm 会要求填写 python 的路径，我并没有填写 conda 的 envs 路径，而是直接使用的 base env，并且系统变量 PATH 中没有设置 python 路径，原理不是很清楚，设置完系统变量就好了。
+
 附链接：[解决方案：见 Anya Datasci 的回答](https://intellij-support.jetbrains.com/hc/en-us/community/posts/360001194720-Numpy-import-error-in-PyCharm-Importing-the-multiarray-numpy-extension-module-failed-)
 
 4) 安装 pyecharts：
 
-试了 matplotlib，由于横轴表示大量的单词，导致 matplotlib 画出来的图几乎没法看，而且不支持缩放，因此改用 pyecharts 试试：
+试了 matplotlib，由于横轴表示大量的单词，导致 matplotlib 画出来的图几乎没法看，而且不支持缩放，因此改用 pyecharts 试试
 
 注：pyecharts 不支持 conda 安装，conda 中默认自带 pip，不是 pip3：
 
