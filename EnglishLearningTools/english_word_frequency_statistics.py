@@ -81,7 +81,8 @@ class EnglishWordFrequencyStatistics(object):
             temp = EnglishWordFrequencyStatisticsResults()
             for i, result in enumerate(result_list):
                 temp.add(result)
-                x_values.append(result.filename)
+                # x_values.append(result.filename)
+                x_values.append(str(i + 1))
                 y_values.append(temp.total_words_distinct)
 
             fig.add(legend_list[index], x_values, y_values, legend_pos="right", is_datazoom_show=True, datazoom_range=[0, 100])

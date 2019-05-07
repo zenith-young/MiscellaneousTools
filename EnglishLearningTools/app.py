@@ -12,7 +12,8 @@ def main():
 
     stat = EnglishWordFrequencyStatistics(
         # r'C:\Fate\Documents\学习资料\美语资料\ESLPod\ESL Podcast\Learnt'
-        r'C:\Fate\Documents\学习资料\美语资料\ESLPod\ESL Podcast\PDF'
+        # r'C:\Fate\Documents\学习资料\美语资料\ESLPod\ESL Podcast\PDF'
+        r'C:\Users\h141074\Desktop\1. converted_txt'
     )
     stat.initialize()
     normal_results, lemmed_results = stat.calculate()
