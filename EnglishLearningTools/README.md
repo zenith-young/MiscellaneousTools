@@ -90,6 +90,8 @@ pip install -U nltk
 - averaged_perceptron_tagger
 - wordnet
 
+注：默认会安装到 C:\nltk_data 下，如果需要安装到其他地方，需要手动配置系统环境变量 NLTK_DATA，详细请参考官网安装步骤
+
 修改 app.py，填写你要统计的文件或者文件夹
 
 再编译运行源码就没有错误了

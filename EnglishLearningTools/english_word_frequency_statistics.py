@@ -14,8 +14,8 @@ from pdfminer.pdftypes import PDFException
 from nltk import pos_tag
 from nltk.stem import WordNetLemmatizer
 
-from pyecharts import Bar
-from pyecharts import Line
+from pyecharts.charts import Bar
+from pyecharts.charts import Line
 
 from utils import FileSystemUtils
 
