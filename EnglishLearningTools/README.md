@@ -135,6 +135,10 @@ C:\Fate\Developer\Anaconda_5.3.1\Library\bin
 
 ```
 pip install pyecharts
-pip install pyecharts_snapshot
 ```
 
+2019-5-20 更新：
+
+升级 pyecharts 版本到 1.0，弃用 0.5
+
+注：pyecharts 有两个大版本，0.5 和 1.0，API 不通用，上面命令直接下载的是最新版本，即 1.0 版本，貌似也可以在 pip install 时指定包版本。
