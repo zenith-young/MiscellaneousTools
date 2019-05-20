@@ -14,6 +14,8 @@ from pdfminer.pdftypes import PDFException
 from nltk import pos_tag
 from nltk.stem import WordNetLemmatizer
 
+from pyecharts import options as opts
+from pyecharts.globals import ThemeType
 from pyecharts.charts import Bar
 from pyecharts.charts import Line
 
@@ -62,13 +64,42 @@ class EnglishWordFrequencyStatistics(object):
         x_values.sort()
         y_values = [results.word_frequency[key] for key in x_values]
 
-        fig = Bar('English Word Frequency Statistics', width=1280, height=800, title_pos='center')
-        fig.add('Result', x_values, y_values, legend_pos="right", is_datazoom_show=True, datazoom_range=[0, 100])
+        init_opts = opts.InitOpts(width='1280px', height='800px', page_title='English Word Frequency Statistics')
+        title_opts = opts.TitleOpts(title='English Word Frequency Statistics')
+        tooltip_opts = opts.TooltipOpts()
+        toolbox_opts = opts.ToolboxOpts()
+        legend_opts = opts.LegendOpts()
+        datazoom_opts = [opts.DataZoomOpts(range_start=0, range_end=100)]
+
+        fig = Bar(init_opts=init_opts)
+        fig.set_global_opts(
+            title_opts=title_opts,
+            tooltip_opts=tooltip_opts,
+            toolbox_opts=toolbox_opts,
+            legend_opts=legend_opts,
+            datazoom_opts=datazoom_opts
+        )
+        fig.add_xaxis(x_values)
+        fig.add_yaxis('Word Frequency', y_values)
         fig.render(path=self._report_folder + '\\' + output_filename)
 
     def plot_word_learning_curve(self, results_list, legend_list, output_filename):
 
-        fig = Line('English Word Learning Curve', width=1280, height=800, title_pos='center')
+        init_opts = opts.InitOpts(width='1280px', height='800px', page_title='English Word Learning Curve')
+        title_opts = opts.TitleOpts(title='English Word Learning Curve')
+        tooltip_opts = opts.TooltipOpts()
+        toolbox_opts = opts.ToolboxOpts()
+        legend_opts = opts.LegendOpts()
+        datazoom_opts = [opts.DataZoomOpts(range_start=0, range_end=100)]
+
+        fig = Line(init_opts=init_opts)
+        fig.set_global_opts(
+            title_opts=title_opts,
+            tooltip_opts=tooltip_opts,
+            toolbox_opts=toolbox_opts,
+            legend_opts=legend_opts,
+            datazoom_opts=datazoom_opts
+        )
 
         for index, results in enumerate(results_list):
 
@@ -85,7 +116,8 @@ class EnglishWordFrequencyStatistics(object):
                 x_values.append(str(i + 1))
                 y_values.append(temp.total_words_distinct)
 
-            fig.add(legend_list[index], x_values, y_values, legend_pos="right", is_datazoom_show=True, datazoom_range=[0, 100])
+            fig.add_xaxis(x_values)
+            fig.add_yaxis(legend_list[index], y_values)
 
         fig.render(path=self._report_folder + '\\' + output_filename)
 
