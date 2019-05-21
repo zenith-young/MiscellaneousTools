@@ -142,7 +142,7 @@ class EnglishWordFrequencyStatistics(object):
 
         for file in files:
             ext = FileSystemUtils.get_file_ext(file)
-            if ext == '.txt':
+            if ext == '.txt' or ext == '.srt':
                 FileSystemUtils.copyFilesToFolder([file], converted_folder)
             elif ext == '.pdf':
                 try:
