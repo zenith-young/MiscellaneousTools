@@ -11,7 +11,7 @@ def main():
     print("")
 
     stat = EnglishWordFrequencyStatistics(
-        r'C:\Fate\Workplace\doc\LearningNotes\English\Marvel Movies\Subs'
+        r'C:\Fate\Temp\xxx.txt'
     )
     stat.initialize()
     normal_results, lemmed_results = stat.calculate()
